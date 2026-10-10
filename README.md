@@ -68,19 +68,13 @@ Kiểm tra danh sách → Khôi phục nếu thiếu
 
 Điều này là **mục tiêu thiết kế, không phải cam kết mức tiêu thụ pin**. Cần đo kiểm thực tế trên từng thiết bị để kết luận mức tiết kiệm hoặc độ ổn định thông báo.
 
-## 🆚 Bản Lite và bản Full
 
-| Thành phần | GMS Protect Lite |
-| --- | --- |
-| MILLET Protection | ✅ Có |
-| JobScheduler tự khôi phục | ✅ Có |
-| Hỗ trợ FCM Reconnect | ✅ Có |
-| GMS Binding | ✅ Có |
-| MiPush Protection | ❌ Đã loại bỏ |
-| Aurogon Protection | ❌ Đã loại bỏ |
-| Foreground Service thường trực | ❌ Không sử dụng |
-| Polling liên tục | ❌ Không sử dụng |
 
+| Thành phần | GMS Protect Lite 
+| MILLET Protection | ✅ Có 
+| JobScheduler tự khôi phục | ✅ Có 
+| Hỗ trợ FCM Reconnect | ✅ Có 
+| GMS Binding | ✅ Có 
 ## ❓ Câu hỏi thường gặp
 
 **Có cần root, ADB hoặc Shizuku không?**  
