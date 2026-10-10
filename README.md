@@ -2,97 +2,116 @@
 
 **Lightweight GMS & FCM Protection for Xiaomi HyperOS**
 
-> **Tối giản cơ chế · Tối ưu tài nguyên · Hoạt động tự động**
+> **Tối giản cơ chế · Tối ưu hoạt động nền · Tự động bảo vệ**
 
-GMS Protect Lite là ứng dụng hỗ trợ duy trì hoạt động của **Google Mobile Services (GMS)** và kết nối **Firebase Cloud Messaging (FCM)** trên các thiết bị Xiaomi chạy **HyperOS**, đặc biệt là ROM nội địa Trung Quốc.
+**GMS Protect Lite** là ứng dụng hỗ trợ duy trì hoạt động của **Google Mobile Services (GMS)** và kết nối **Firebase Cloud Messaging (FCM)** trên thiết bị Xiaomi chạy **HyperOS**, đặc biệt là ROM nội địa Trung Quốc.
 
-Ứng dụng tập trung vào một mục tiêu: **hỗ trợ bảo vệ GMS khi cần, thay vì duy trì một dịch vụ chạy nền liên tục**. Thiết kế này hướng đến giảm số lần đánh thức CPU và tác vụ không cần thiết, nhưng hiệu quả tiết kiệm pin thực tế còn phụ thuộc thiết bị và phiên bản hệ thống.
+Ứng dụng được xây dựng theo một nguyên tắc: **không giữ tiến trình chạy thường trực chỉ để chờ sự kiện**. Thay vào đó, GMS Protect Lite tận dụng khả năng lập lịch theo sự kiện của Android để kiểm tra và khôi phục cấu hình bảo vệ khi cần, nhằm hạn chế công việc nền không cần thiết.
 
 ## 📥 Tải xuống
 
 ### **[⬇️ Download GMS Protect Lite — Latest Release](https://github.com/hoanghanhdevvn/GMS-Protect-Lite/releases/latest)**
 
-- Xem mọi phiên bản: **[GitHub Releases](https://github.com/hoanghanhdevvn/GMS-Protect-Lite/releases)**
-- Tải tệp **`.apk`** trong mục **Assets** của bản phát hành, không cần tìm APK trong thư mục mã nguồn.
-- Chỉ cài APK từ nguồn bạn tin cậy. Một số phiên bản HyperOS có thể yêu cầu cho phép cài đặt ứng dụng từ nguồn ngoài.
+Xem danh sách các phiên bản tại **[GitHub Releases](https://github.com/hoanghanhdevvn/GMS-Protect-Lite/releases)**.
 
-## ✨ Điểm nổi bật
+Mở bản phát hành bạn muốn cài đặt, chọn tệp **`.apk`** trong mục **Assets** rồi cài đặt lên điện thoại. APK được phân phối qua **Releases**, không phải thư mục mã nguồn của repository.
+
+## ✨ Tính năng nổi bật
 
 | Tính năng | Mô tả |
 | --- | --- |
-| **Thiết kế tối giản** | Không duy trì Foreground Service thường trực hay vòng lặp kiểm tra dày đặc. |
-| **MILLET Protection** | Hỗ trợ duy trì mục bảo vệ cho Google Play services và Google Play Store trong `MILLET_NO_RESTRICT_APP`. |
-| **Tự khôi phục theo sự kiện** | Dùng `JobScheduler` để nhận sự kiện thay đổi và thử khôi phục danh sách bảo vệ. |
-| **FCM Recovery** | Có chức năng hỗ trợ kiểm tra/khôi phục kết nối FCM trong những tình huống được ứng dụng hỗ trợ. |
-| **GMS Binding** | Hỗ trợ tương tác với GMS khi tiến trình ứng dụng còn hoạt động; không phải dịch vụ giữ GMS sống vĩnh viễn. |
-| **Không Root / ADB / Shizuku** | Không yêu cầu các công cụ này cho quy trình sử dụng thông thường, nếu quyền hệ thống cần thiết được cho phép. |
-| **Lite đúng nghĩa** | Loại bỏ cơ chế MiPush và Aurogon của bản Full để giảm thành phần và tác vụ bổ sung. |
+| **Không chạy Foreground Service thường trực** | Không cần duy trì thông báo của một dịch vụ chạy nền liên tục chỉ để theo dõi MILLET. |
+| **Theo dõi theo sự kiện** | Dùng `JobScheduler` để nhận sự kiện thay đổi cấu hình bảo vệ khi Android chuyển công việc đến ứng dụng. |
+| **MILLET Protection** | Hỗ trợ duy trì các mục cần thiết trong `MILLET_NO_RESTRICT_APP` cho Google Play services, Google Play Store và chính ứng dụng. |
+| **Tự khôi phục cấu hình** | Kiểm tra và thử bổ sung mục bảo vệ bị thiếu, thay vì ghi lại danh sách không cần thiết. |
+| **FCM Recovery** | Có công cụ hỗ trợ kiểm tra và khôi phục kết nối FCM trong những trường hợp được ứng dụng hỗ trợ. |
+| **GMS Binding** | Hỗ trợ tương tác với GMS khi tiến trình ứng dụng đang hoạt động; không phải cơ chế giữ tiến trình GMS sống vĩnh viễn. |
+| **Không yêu cầu Root / ADB / Shizuku** | Quy trình sử dụng thông thường dựa trên các quyền mà thiết bị cho phép người dùng cấp. |
 
 ## ⚙️ Cơ chế hoạt động
 
-GMS Protect Lite ưu tiên cách tiếp cận **event-driven** thay vì liên tục chạy nền:
+GMS Protect Lite ưu tiên **Event-Driven Protection** thay cho việc giữ một dịch vụ hoạt động liên tục:
 
-1. Khi người dùng bật bảo vệ, ứng dụng kiểm tra quyền cần thiết và thiết lập danh sách MILLET phù hợp.
-2. Ứng dụng đăng ký công việc theo dõi thay đổi bằng `JobScheduler`.
-3. Khi không có việc cần xử lý, không cần duy trì Foreground Service chỉ để chờ.
-4. Nếu Android chuyển sự kiện thay đổi đến Job, ứng dụng kiểm tra và **thử** khôi phục các mục MILLET bị thiếu.
-5. Khi cần, người dùng có thể sử dụng tính năng hỗ trợ kết nối lại FCM.
+1. Khi người dùng bật bảo vệ, ứng dụng kiểm tra quyền cần thiết và cấu hình danh sách MILLET.
+2. Ứng dụng đăng ký tác vụ theo dõi thay đổi thông qua `JobScheduler`.
+3. Khi không có việc cần xử lý, ứng dụng không cần giữ Foreground Service thường trực.
+4. Nếu Android kích hoạt công việc sau một thay đổi, Lite kiểm tra danh sách và **thử khôi phục** các mục còn thiếu.
+5. Người dùng có thể sử dụng chức năng hỗ trợ khôi phục FCM khi cần.
 
 ```text
-Thiết lập bảo vệ MILLET
-          ↓
+Thiết lập MILLET Protection
+            ↓
 Đăng ký JobScheduler
-          ↓
-Chờ sự kiện (không cần service thường trực)
-          ↓
-Kiểm tra danh sách → Khôi phục nếu thiếu
+            ↓
+Chờ sự kiện hệ thống
+(không cần service thường trực)
+            ↓
+Kiểm tra danh sách bảo vệ
+            ↓
+Chỉ bổ sung khi phát hiện thiếu
 ```
 
-**Nguyên tắc thiết kế:** *Không cố giữ ứng dụng chạy liên tục — chỉ xử lý khi hệ thống cho phép và có việc cần làm.*
+> **Nguyên tắc tối ưu:** Không cố giữ ứng dụng chạy liên tục. Chỉ xử lý khi có công việc cần thiết và Android cho phép thực thi.
 
-> **Lưu ý kỹ thuật:** `JobScheduler` chịu sự điều phối của Android/HyperOS. Việc đăng ký thành công **không bảo đảm** tác vụ luôn chạy tức thời, nhất là khi thiết bị ở Doze hoặc bị hệ thống hạn chế.
+**Lưu ý:** `JobScheduler` chịu sự điều phối của Android/HyperOS. Một tác vụ đã đăng ký không được bảo đảm kích hoạt ngay lập tức, đặc biệt trong Doze hoặc khi có giới hạn nền.
 
-## 📱 Hướng dẫn cài đặt và sử dụng
+## 🔋 Tối ưu hoạt động nền
 
-1. Mở **[Releases](https://github.com/hoanghanhdevvn/GMS-Protect-Lite/releases/latest)** và tải APK trong **Assets**.
-2. Cài đặt APK, sau đó mở **GMS Protect Lite**.
-3. Cấp **quyền sửa đổi cài đặt hệ thống** (nếu được yêu cầu và thiết bị hỗ trợ) để ứng dụng có thể cập nhật danh sách MILLET.
-4. Bật chức năng bảo vệ và kiểm tra trạng thái trong ứng dụng.
-5. Nếu thông báo vẫn chậm, kiểm tra kết nối GMS/FCM và cài đặt tiết kiệm pin của HyperOS.
+Thiết kế của GMS Protect Lite hướng đến giảm tác vụ không cần thiết khi điện thoại ở trạng thái chờ:
 
-**Package name:** `com.hanh.gmsprotect.lite` — khác với bản Full, nên có thể cài song song (nếu bản APK phát hành đúng package này).
+- Không sử dụng Foreground Service thường trực để canh trạng thái bảo vệ.
+- Không dùng vòng lặp kiểm tra nhanh liên tục.
+- Ưu tiên sự kiện hệ thống thay vì tự đánh thức CPU để kiểm tra theo nhịp ngắn.
+- Chỉ thử cập nhật danh sách MILLET khi phát hiện mục cần bảo vệ bị thiếu.
+- Để Android quyết định thời điểm thực thi công việc đã lập lịch.
 
-## 🔋 Vì sao bản Lite hướng đến tối ưu pin?
+Những điểm trên phản ánh **kiến trúc hướng đến tiết kiệm tài nguyên**, không phải số liệu đo pin hay cam kết tiêu thụ thấp hơn trên mọi thiết bị.
 
-Ứng dụng được thiết kế để **giảm hoạt động nền không cần thiết**, thay vì duy trì liên tục một tiến trình, Foreground Service hoặc vòng lặp thăm dò nhanh. Việc sử dụng `JobScheduler` cho phép Android quyết định thời điểm thích hợp để chạy công việc.
+### So sánh cách tối ưu nền với FCM Guard
 
-Điều này là **mục tiêu thiết kế, không phải cam kết mức tiêu thụ pin**. Cần đo kiểm thực tế trên từng thiết bị để kết luận mức tiết kiệm hoặc độ ổn định thông báo.
+| Cách tiếp cận | **GMS Protect Lite** | **[FCM Guard](https://github.com/ReedGAOOO/FCMGuard-HyperOS)** |
+| --- | --- | --- |
+| Theo dõi thay đổi MILLET | `JobScheduler` nhận công việc khi hệ thống kích hoạt | `ContentObserver` theo dõi thay đổi khi tiến trình đang hoạt động |
+| Dịch vụ nền thường trực | Không sử dụng Foreground Service thường trực | Có chế độ Foreground Service **tùy chọn** |
+| Kiểm tra dự phòng | Không sử dụng vòng polling liên tục | Có kiểm tra dự phòng khoảng 30 phút **khi tiến trình đang chạy** |
+| Ưu tiên kiến trúc | Giảm nhu cầu duy trì tiến trình chờ | Theo dõi nhanh khi tiến trình còn chạy, có chế độ tăng khả năng tồn tại của tiến trình |
 
+**Đây là so sánh về cách tổ chức hoạt động nền, không phải xếp hạng ứng dụng.** Mức hao pin và thời gian phản hồi thực tế còn tùy ROM, cài đặt và cách Android quản lý tiến trình.
+
+## 📱 Cài đặt và sử dụng
+
+1. Tải APK tại **[Releases](https://github.com/hoanghanhdevvn/GMS-Protect-Lite/releases/latest)**.
+2. Cài đặt và mở **GMS Protect Lite**.
+3. Cấp quyền **sửa đổi cài đặt hệ thống** khi ứng dụng yêu cầu và thiết bị hỗ trợ.
+4. Bật bảo vệ, sau đó kiểm tra trạng thái trên màn hình chính.
+5. Nếu thông báo vẫn chậm, kiểm tra trạng thái GMS/FCM và cài đặt pin của ứng dụng nhận thông báo trên HyperOS.
+
+**Package:** `com.hanh.gmsprotect.lite`
 
 ## ❓ Câu hỏi thường gặp
 
 **Có cần root, ADB hoặc Shizuku không?**  
-Không cần trong quy trình thiết lập thông thường. Tuy nhiên, khả năng sửa MILLET phụ thuộc vào API, quyền và chính sách của bản HyperOS đang sử dụng.
+Không cần cho quy trình sử dụng thông thường. Tuy nhiên, thao tác với MILLET phụ thuộc quyền và chính sách của phiên bản HyperOS đang dùng.
 
-**MILLET Protection có phải là quyền “Không hạn chế pin” của Android không?**  
-Không. Danh sách `MILLET_NO_RESTRICT_APP` là một phần cơ chế riêng của Xiaomi và **không đồng nghĩa** với việc ứng dụng được tự cấp quyền miễn tối ưu pin Android/Doze.
+**MILLET Protection có giống quyền “Không hạn chế pin” không?**  
+Không. `MILLET_NO_RESTRICT_APP` là danh sách riêng của Xiaomi, không đồng nghĩa với quyền miễn tối ưu pin Android/Doze hay tất cả cài đặt quản lý pin HyperOS.
+
+**Có cần mở ứng dụng liên tục không?**  
+Không cần giữ giao diện mở để sử dụng công việc theo sự kiện đã đăng ký. Tuy nhiên, Android/HyperOS có thể trì hoãn hoặc hạn chế việc thực thi trong nền.
 
 **Ứng dụng có bảo đảm thông báo đến 100% không?**  
-Không. Thông báo còn phụ thuộc vào GMS, mạng, ứng dụng nhận tin, chế độ Doze và chính sách quản lý nền của HyperOS.
+Không. Thông báo còn phụ thuộc mạng, Google Play services, ứng dụng nhận tin, Doze và chính sách quản lý nền của HyperOS.
 
-**Có cần mở GMS Protect Lite liên tục không?**  
-Không cần giữ giao diện mở liên tục để sử dụng cơ chế theo sự kiện. Tuy nhiên, nếu Android/HyperOS trì hoãn hoặc chặn công việc nền, việc tự khôi phục cũng có thể bị chậm.
+**Ứng dụng có tự cấp được quyền “Không hạn chế pin” một cách âm thầm không?**  
+Không. Quyền miễn tối ưu pin của Android và các cài đặt riêng của HyperOS có thể cần người dùng thao tác trong phần cài đặt hệ thống.
 
-**Có thể cài cùng bản Full không?**  
-Có, nếu APK Lite sử dụng package `com.hanh.gmsprotect.lite`. Quyền và thiết lập của hai ứng dụng được quản lý riêng.
+## ⚠️ Tương thích và giới hạn
 
-## ⚠️ Giới hạn và tương thích
-
-- Tập trung vào **Xiaomi HyperOS**; một số phiên bản ROM có thể không hỗ trợ đầy đủ cơ chế MILLET.
-- Không sửa đổi firmware, không thay thế hệ thống thông báo Android.
-- Không đảm bảo FCM luôn kết nối hoặc khôi phục ngay khi tắt màn hình.
-- Một số quyền/cấu hình pin của Android **không thể được ứng dụng thường tự cấp âm thầm**.
-- Nên tải bản mới nhất và kiểm tra phần ghi chú của từng Release trước khi cập nhật.
+- Tập trung vào **Xiaomi HyperOS**; hiệu quả và khả năng truy cập MILLET khác nhau theo phiên bản ROM.
+- Không sửa đổi firmware hoặc thay thế hệ thống thông báo Android.
+- Không bảo đảm FCM luôn kết nối hay tác vụ JobScheduler được thực thi tức thời.
+- Không thể bỏ qua mọi giới hạn nền của Android/HyperOS.
+- Nên cập nhật từ **GitHub Releases** và đọc ghi chú phiên bản trước khi cài.
 
 ## 👨‍💻 Tác giả
 
@@ -104,4 +123,4 @@ Repository: [GMS-Protect-Lite](https://github.com/hoanghanhdevvn/GMS-Protect-Lit
 
 **GMS Protect Lite — Less Background Activity. Smarter Protection.**
 
-*Dự án độc lập, không có liên kết chính thức với Google hoặc Xiaomi.*
+*Dự án độc lập, không liên kết chính thức với Google hoặc Xiaomi.*
